@@ -39,10 +39,13 @@ func NewClient(baseURL string) *Client {
 }
 
 // FetchSignedPrice fetches signed price data from the oracle.
-func (c *Client) FetchSignedPrice(token, trustedKey string) (*SignedPriceData, error) {
+// The trustedKey is optional. If provided, it will be sent as a query parameter.
+func (c *Client) FetchSignedPrice(token string, trustedKey ...string) (*SignedPriceData, error) {
 	params := url.Values{}
 	params.Add("token", token)
-	params.Add("trustedClientKey", trustedKey)
+	if len(trustedKey) > 0 && trustedKey[0] != "" {
+		params.Add("trustedClientKey", trustedKey[0])
+	}
 	reqURL := fmt.Sprintf("%s?%s", c.BaseURL, params.Encode())
 
 	resp, err := http.Get(reqURL)

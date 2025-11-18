@@ -26,11 +26,11 @@ func main() {
 	// 1. Initialize the client
 	oracleClient := oraclesdk.NewClient("https://arkham-dvpn.vercel.app/api/price")
 
-	// 2. Fetch the signed price data
-
-token := "solana"
-trustedKey := "your-trusted-client-key"
-signedData, err := oracleClient.FetchSignedPrice(token, trustedKey)
+	// --- Example 1: Fetching from a protected endpoint ---
+	fmt.Println("--- Fetching from protected endpoint ---")
+	token := "solana"
+	trustedKey := "your-trusted-client-key"
+	signedData, err := oracleClient.FetchSignedPrice(token, trustedKey)
 	if err != nil {
 		log.Fatalf("Failed to fetch signed price: %v", err)
 	}
@@ -40,7 +40,17 @@ signedData, err := oracleClient.FetchSignedPrice(token, trustedKey)
 	fmt.Printf("- Timestamp: %d\n", signedData.Timestamp)
 	fmt.Printf("- Signature: %x\n", signedData.Signature)
 
-	// 3. Recreate the message hash that was signed
+	// --- Example 2: Fetching from a public endpoint ---
+	fmt.Println("\n--- Fetching from public endpoint ---")
+	// Simply omit the trustedKey argument
+	publicSignedData, err := oracleClient.FetchSignedPrice(token)
+	if err != nil {
+		log.Fatalf("Failed to fetch signed price from public endpoint: %v", err)
+	}
+	fmt.Printf("Successfully fetched data for %s:\n", publicSignedData.Price)
+
+
+	// --- Recreate the message hash for a transaction ---
 	// This is required for the Ed25519Program instruction
 	messageHash, err := signedData.CreateOracleMessageHash()
 	if err != nil {
